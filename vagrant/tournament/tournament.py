@@ -138,3 +138,19 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
+    dbConnection = connect()
+    cursor = dbConnection.cursor()
+    q = "SELECT * FROM players ORDER BY wins DESC;"
+    cursor.execute(q)
+    players = cursor.fetchall()
+    pairs = []
+    pair = []
+    for i in range(0, len(players), 2):
+        pair = [players[i][0], players[i][1], players[i+1][0], players[i+1][1]]
+        pairs.append(pair)
+    try:
+        dbConnection.commit()
+        dbConnection.close()
+    except psycopg2.Error as e:
+        return e
+    return pairs

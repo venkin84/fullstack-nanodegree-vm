@@ -15,8 +15,10 @@ def deleteMatches():
     """Remove all the match records from the database."""
     dbConnection = connect()
     cursor = dbConnection.cursor()
-    q = "DELETE FROM matches;"
-    cursor.execute(q)
+    q1 = "DELETE FROM matches;"
+    cursor.execute(q1)
+    q2 = "UPDATE players SET matches = 0, wins = 0;"
+    cursor.execute(q2)
     try:
         dbConnection.commit()
         dbConnection.close()
@@ -106,7 +108,20 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
-
+    dbConnection = connect()
+    cursor = dbConnection.cursor()
+    q1 = "INSERT INTO matches (winnerID, looserID) VALUES (%s, %s);"
+    cursor.execute(q1, (winner, loser,))
+    q2 = "UPDATE players SET wins = wins + 1 WHERE playerID = %s;"
+    cursor.execute(q2, (winner,))
+    q3 = "UPDATE players SET matches = matches + 1 WHERE playerID = %s OR playerID = %s;"
+    cursor.execute(q3, (winner, loser,))
+    try:
+        dbConnection.commit()
+        dbConnection.close()
+    except psycopg2.Error as e:
+        return e
+    return True
 
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.

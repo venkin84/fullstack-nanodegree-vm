@@ -26,6 +26,7 @@ def deleteMatches():
         return e
     return True
 
+
 def deletePlayers():
     """Remove all the player records from the database."""
     dbConnection = connect()
@@ -76,11 +77,12 @@ def registerPlayer(name):
         return e
     return True
 
+
 def playerStandings():
     """Returns a list of the players and their win records, sorted by wins.
 
-    The first entry in the list should be the player in first place, or a player
-    tied for first place if there is currently a tie.
+    The first entry in the list should be the player in first place,
+    or a player tied for first place if there is currently a tie.
 
     Returns:
       A list of tuples, each of which contains (id, name, wins, matches):
@@ -100,6 +102,7 @@ def playerStandings():
     except psycopg2.Error as e:
         return e
     return players
+
 
 def reportMatch(winner, loser):
     """Records the outcome of a single match between two players.
@@ -122,6 +125,7 @@ def reportMatch(winner, loser):
     except psycopg2.Error as e:
         return e
     return True
+
 
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.

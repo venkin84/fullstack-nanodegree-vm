@@ -6,25 +6,51 @@
 import psycopg2
 
 
-def connect(psql_dbName, psql_user, psql_host, psql_password):
-    try:
-        pg_connection = psycopg2.connect(dbname=psql_dbName, user=psql_user, host=psql_host, password=psql_password)
-        return pg_connection;
-    except psycopg2.Error as e:
-        print e.pgerror
-        return None;
+def connect():
+    """Connect to the PostgreSQL database.  Returns a database connection."""
+    return psycopg2.connect("dbname=tournament")
 
 
 def deleteMatches():
     """Remove all the match records from the database."""
-
+    dbConnection = connect()
+    cursor = dbConnection.cursor()
+    q = "DELETE FROM matches;"
+    cursor.execute(q)
+    try:
+        dbConnection.commit()
+        dbConnection.close()
+    except psycopg2.Error as e:
+        return e
+    return True
 
 def deletePlayers():
     """Remove all the player records from the database."""
+    dbConnection = connect()
+    cursor = dbConnection.cursor()
+    q = "DELETE FROM players;"
+    cursor.execute(q)
+    try:
+        dbConnection.commit()
+        dbConnection.close()
+    except psycopg2.Error as e:
+        return e
+    return True
 
 
 def countPlayers():
     """Returns the number of players currently registered."""
+    dbConnection = connect()
+    cursor = dbConnection.cursor()
+    q = "SELECT COUNT(*) FROM players;"
+    cursor.execute(q)
+    count = cursor.fetchone()
+    try:
+        dbConnection.commit()
+        dbConnection.close()
+    except psycopg2.Error as e:
+        return e
+    return count[0]
 
 
 def registerPlayer(name):
@@ -37,6 +63,16 @@ def registerPlayer(name):
       name: the player's full name (need not be unique).
     """
 
+    dbConnection = connect()
+    cursor = dbConnection.cursor()
+    q = "INSERT INTO players (playerName) VALUES (%s);"
+    cursor.execute(q, (name,))
+    try:
+        dbConnection.commit()
+        dbConnection.close()
+    except psycopg2.Error as e:
+        return e
+    return True
 
 def playerStandings():
     """Returns a list of the players and their win records, sorted by wins.
@@ -51,7 +87,17 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
-
+    dbConnection = connect()
+    cursor = dbConnection.cursor()
+    q = "SELECT * FROM players ORDER BY wins DESC;"
+    cursor.execute(q)
+    players = cursor.fetchall()
+    try:
+        dbConnection.commit()
+        dbConnection.close()
+    except psycopg2.Error as e:
+        return e
+    return players
 
 def reportMatch(winner, loser):
     """Records the outcome of a single match between two players.
